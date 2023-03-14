@@ -1,4 +1,3 @@
-import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -50,9 +49,11 @@ function DrawerDesign() {
             },
           }}
           disableGutters
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
           className={
-            location.pathname === '/' ? classes.active : classes.notactive
+            location.pathname === '/dashboard'
+              ? classes.active
+              : classes.notactive
           }
         >
           <ListItemButton dense>

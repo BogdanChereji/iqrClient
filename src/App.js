@@ -2,6 +2,7 @@ import './App.css';
 import AngajatiScreen from './Screens/Angajati/AngajatiScreen';
 import ClientiScreen from './Screens/Clienti/ClientiScreen';
 import DashboardScreen from './Screens/DashboardScreen';
+import HomePageScreen from './Screens/HomePageScreen';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './Layout/Layout';
 import ViewAngajat from './Screens/Angajati/ViewAngajat';
@@ -34,7 +35,7 @@ function App() {
         <ToastContainer position="bottom-center" limit={1} />
         <Layout>
           <Routes>
-            <Route path="/" element={<DashboardScreen />} />
+            <Route path="/" element={<HomePageScreen />} />
             {/* //ProtectedRoute */}
             {/* Angajati */}
             <Route
@@ -45,6 +46,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardScreen />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/angajat/:nume"
               element={
