@@ -46,6 +46,7 @@ export default function DashboardScreen() {
     hAxis: {
       title: 'Ore lucrate',
     },
+    backgroundColor: 'none',
   };
 
   useEffect(() => {
@@ -168,27 +169,9 @@ export default function DashboardScreen() {
                     </Typography>
                   </CardContent>
                 </Card>
-                <Card
-                  sx={{
-                    minWidth: { md: '250px', lg: '250px', xl: '250px' },
-                    textAlign: 'left',
-                    m: 2,
-                  }}
-                >
-                  <CardContent>
-                    <Typography sx={{ fontSize: 20 }}>
-                      Ore lucrate luna aceasta
-                    </Typography>
-                    <Typography sx={{ fontSize: 30 }}>
-                      {summary.pontajZilnic && summary.users[0]
-                        ? summary.pontajZilnic[0].numOre
-                        : 0}
-                    </Typography>
-                  </CardContent>
-                </Card>
                 <Chart
                   options={options}
-                  width="96%"
+                  width="100%"
                   height="400px"
                   chartType="BarChart"
                   loader={<div>Loading...</div>}
@@ -200,7 +183,7 @@ export default function DashboardScreen() {
                       '#000041',
                     ]),
                   ]}
-                ></Chart>
+                />
               </Box>
             ) : (
               'Vă rugăm să vă conectați'
