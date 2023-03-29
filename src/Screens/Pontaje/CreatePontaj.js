@@ -84,7 +84,7 @@ function CreatePontaj() {
     try {
       dispatch({ type: 'CREATE_REQUEST' });
       const { date } = await axios.post(
-        '/api/pontaje',
+        'https://iqrserver.onrender.com/api/pontaje',
         {
           numeAngajat,
           data,
@@ -144,7 +144,10 @@ function CreatePontaj() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const { data } = await axios.get(`/api/users `, {});
+        const { data } = await axios.get(
+          `https://iqrserver.onrender.com/api/users `,
+          {}
+        );
 
         dispatch({ type: 'FETCH_SUCCESS_USERS', payload: data });
       } catch (err) {}
