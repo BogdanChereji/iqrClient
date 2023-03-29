@@ -70,7 +70,7 @@ export default function AngajatiScreen() {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => navigate(`/clientnou`)}
+              onClick={() => navigate(`/angajatnou`)}
             >
               + Angajat nou
             </Button>

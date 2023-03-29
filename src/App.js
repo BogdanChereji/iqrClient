@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './Layout/Layout';
 import ViewAngajat from './Screens/Angajati/ViewAngajat';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 import { ToastContainer } from 'react-toastify';
 import CreateAngajati from './Screens/Angajati/CreateAngajati';
 import CreateClient from './Screens/Clienti/CreateClient';
@@ -66,9 +67,11 @@ function App() {
             <Route
               path="/AngajatNou"
               element={
-                <ProtectedRoute>
-                  <CreateAngajati />
-                </ProtectedRoute>
+                <AdminRoute>
+                  <ProtectedRoute>
+                    <CreateAngajati />
+                  </ProtectedRoute>
+                </AdminRoute>
               }
             />
             <Route
@@ -90,9 +93,11 @@ function App() {
             <Route
               path="/ClientNou"
               element={
-                <ProtectedRoute>
-                  <CreateClient />
-                </ProtectedRoute>
+                <AdminRoute>
+                  <ProtectedRoute>
+                    <CreateClient />
+                  </ProtectedRoute>
+                </AdminRoute>
               }
             />
             <Route
@@ -122,9 +127,11 @@ function App() {
             <Route
               path="/ServiciuNou"
               element={
-                <ProtectedRoute>
-                  <CreateServicii />
-                </ProtectedRoute>
+                <AdminRoute>
+                  <ProtectedRoute>
+                    <CreateServicii />
+                  </ProtectedRoute>
+                </AdminRoute>
               }
             />
             <Route
@@ -154,9 +161,11 @@ function App() {
             <Route
               path="/EchipamentNou"
               element={
-                <ProtectedRoute>
-                  <CreateEchipament />
-                </ProtectedRoute>
+                <AdminRoute>
+                  <ProtectedRoute>
+                    <CreateEchipament />
+                  </ProtectedRoute>
+                </AdminRoute>
               }
             />
             <Route
