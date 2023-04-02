@@ -40,6 +40,8 @@ const reducer = (state, action) => {
       return { ...state, angajati: action.payload, loading: false };
     case 'FETCH_SUCCESS_CLIENTI':
       return { ...state, clienti: action.payload, loading: false };
+    case 'FETCH_SUCCESS_USERS':
+      return { ...state, users: action.payload, loading: false };
     case 'FETCH_SUCCESS_SERVICII':
       return { ...state, servicii: action.payload, loading: false };
     case 'FETCH_FAIL':
@@ -51,13 +53,14 @@ const reducer = (state, action) => {
 };
 
 function CreatePontaj() {
-  const [{ angajati, clienti, servicii, error, loading }, dispatch] =
+  const [{ angajati, clienti, servicii, users, error, loading }, dispatch] =
     useReducer(reducer, {
       loading: '',
       error: '',
       angajati: [],
       clienti: [],
       servicii: [],
+      users: [],
     });
 
   const { state } = useContext(Store);
@@ -69,10 +72,11 @@ function CreatePontaj() {
   const [data, setData] = useState('');
   const [ziua, setZiua] = useState('');
   const [denumireClient, setDenumireClient] = useState('');
-  const [denumireServiciu, setDenumireServiciu] = useState('');
+  const [denumireServiciu, setDenumireServiciu] = useState([]);
   const [timp, setTimp] = useState('');
   const [distanta, setDistanta] = useState('');
   const [comentariu, setComentariu] = useState('');
+  const [user, setUser] = useState('');
 
   //Functie creaza produs
   const createHandler = async (e) => {
@@ -80,7 +84,7 @@ function CreatePontaj() {
     try {
       dispatch({ type: 'CREATE_REQUEST' });
       const { date } = await axios.post(
-        'https://iqrserver.onrender.com/api/pontaje',
+        '/api/pontaje',
         {
           numeAngajat,
           data,
@@ -90,6 +94,7 @@ function CreatePontaj() {
           timp,
           distanta,
           comentariu,
+          user,
         },
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },
@@ -134,6 +139,21 @@ function CreatePontaj() {
     };
 
     fetchClienti();
+  }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data } = await axios.get(
+          `https://iqrserver.onrender.com/api/users `,
+          {}
+        );
+
+        dispatch({ type: 'FETCH_SUCCESS_USERS', payload: data });
+      } catch (err) {}
+    };
+
+    fetchUsers();
   }, []);
 
   useEffect(() => {
@@ -254,6 +274,8 @@ function CreatePontaj() {
                         <MenuItem value="Miercuri">Miercuri </MenuItem>
                         <MenuItem value="Joi">Joi </MenuItem>
                         <MenuItem value="Vineri">Vineri </MenuItem>
+                        <MenuItem value="Sambata">Sambata </MenuItem>
+                        <MenuItem value="Duminica">Duminica </MenuItem>
                       </Select>
                     </FormControl>
                     <FormControl required sx={{ mt: 2, width: '100%' }}>
@@ -286,21 +308,14 @@ function CreatePontaj() {
                       },
                     }}
                   >
-                    <FormControl
-                      required
-                      sx={{
-                        mt: 2,
-                        width: ' 100%',
-                        maxWidth: 310,
-                      }}
-                    >
+                    <FormControl required sx={{ mt: 2, width: '100%' }}>
                       <InputLabel id="denumireServiciu">
                         Alege serviciul
                       </InputLabel>
                       <Select
                         labelId="denumireServiciu"
                         id="denumireServiciu"
-                        label="Alege clientul*"
+                        label="Alege denumireServiciu*"
                         onChange={(e) => setDenumireServiciu(e.target.value)}
                       >
                         <MenuItem>
@@ -312,7 +327,7 @@ function CreatePontaj() {
                           </MenuItem>
                         ))}
                       </Select>
-                    </FormControl>{' '}
+                    </FormControl>
                     <FormGroup>
                       <TextField
                         controlid="timp"

@@ -282,6 +282,8 @@ function CreatePontaj() {
                         <MenuItem value="Miercuri">Miercuri </MenuItem>
                         <MenuItem value="Joi">Joi </MenuItem>
                         <MenuItem value="Vineri">Vineri </MenuItem>
+                        <MenuItem value="Sambata">Sambata </MenuItem>
+                        <MenuItem value="Duminica">Duminica </MenuItem>
                       </Select>
                     </FormControl>
                     <FormControl required sx={{ mt: 2, width: '100%' }}>
@@ -390,7 +392,7 @@ function CreatePontaj() {
                   color="secondary"
                   sx={{ m: 2 }}
                 >
-                  Înregistrează
+                  Actualizează
                 </Button>
               </form>
             </Box>

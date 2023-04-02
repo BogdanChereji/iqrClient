@@ -84,7 +84,7 @@ function CreatePontaj() {
     try {
       dispatch({ type: 'CREATE_REQUEST' });
       const { date } = await axios.post(
-        'https://iqrserver.onrender.com/api/pontaje',
+        '/api/pontaje',
         {
           numeAngajat,
           data,
@@ -222,7 +222,7 @@ function CreatePontaj() {
                       },
                     }}
                   >
-                    <FormControl required sx={{ mt: 2, width: '100%' }}>
+                    <FormControl sx={{ mt: 2, width: '100%' }}>
                       <InputLabel id="numeAngajat">
                         Alege utilizatorul
                       </InputLabel>
@@ -291,10 +291,12 @@ function CreatePontaj() {
                           <em>Alege ziua</em>
                         </MenuItem>
                         <MenuItem value="Luni">Luni </MenuItem>
-                        <MenuItem value="Marti">Marți </MenuItem>
+                        <MenuItem value="Marti">Marti </MenuItem>
                         <MenuItem value="Miercuri">Miercuri </MenuItem>
                         <MenuItem value="Joi">Joi </MenuItem>
                         <MenuItem value="Vineri">Vineri </MenuItem>
+                        <MenuItem value="Sambata">Sambata </MenuItem>
+                        <MenuItem value="Duminica">Duminica </MenuItem>
                       </Select>
                     </FormControl>
                     <FormControl required sx={{ mt: 2, width: '100%' }}>

@@ -101,7 +101,6 @@ function DataPontaje() {
         user: pontaj.user,
       });
     });
-
   const columnsAdmin = [
     {
       title: 'ID',
@@ -131,7 +130,7 @@ function DataPontaje() {
     },
     { title: 'TIMP', field: 'timp' },
     { title: 'DISTANTA ', field: 'distanta' },
-    { title: 'CMT', field: 'comentariu', hidden: true },
+    { title: 'CMT', field: 'comentariu' },
     {
       title: 'ACTIUNI',
       align: 'center',
@@ -179,7 +178,7 @@ function DataPontaje() {
     },
     { title: 'TIMP', field: 'timp' },
     { title: 'DISTANTA ', field: 'distanta' },
-    { title: 'CMT', field: 'comentariu', hidden: true },
+    { title: 'CMT', field: 'comentariu' },
   ];
 
   const deleteHandler = async (pontaj) => {
@@ -261,6 +260,7 @@ function DataPontaje() {
             showFirstLastPageButtons: false,
             paginationType: 'normal',
             selection: true,
+            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
             searchFieldStyle: customStyle,
           }}
           localization={{
@@ -303,6 +303,7 @@ function DataPontaje() {
             exportButton: false,
             showFirstLastPageButtons: false,
             paginationType: 'normal',
+            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
             selection: false,
             searchFieldStyle: customStyle,
           }}

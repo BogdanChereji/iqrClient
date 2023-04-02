@@ -131,7 +131,7 @@ function DataPontaje() {
     },
     { title: 'TIMP', field: 'timp' },
     { title: 'DISTANTA ', field: 'distanta' },
-    { title: 'CMT', field: 'comentariu', hidden: true },
+    { title: 'CMT', field: 'comentariu' },
     {
       title: 'ACTIUNI',
       align: 'center',
@@ -179,7 +179,7 @@ function DataPontaje() {
     },
     { title: 'TIMP', field: 'timp' },
     { title: 'DISTANTA ', field: 'distanta' },
-    { title: 'CMT', field: 'comentariu', hidden: true },
+    { title: 'CMT', field: 'comentariu' },
     {
       title: 'ACTIUNI',
       align: 'center',
