@@ -84,7 +84,7 @@ function CreatePontaj() {
     try {
       dispatch({ type: 'CREATE_REQUEST' });
       const { date } = await axios.post(
-        '/api/pontaje',
+        'https://iqrserver.onrender.com/api/pontaje',
         {
           numeAngajat,
           data,

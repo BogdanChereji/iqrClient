@@ -1,17 +1,16 @@
-Pontajul userului nu apare, doar cel al adminului.                  Facut
-La pontaj trebuie sa apara zilele de sambata si duminica.           Facut
-Semn pentru zilele de concediu in raport.                           Facut
-Trebuie sa apara si campul comentarii.                              Facut
+Update 1 - Tabel angajati
+
+Pontaj individual pentru fiecare user ---------------------- Rezolvat
+La pontaj trebuie sa apara zilele de sambata si duminica. -- Rezolvat
+Semn pentru zilele de concediu in raport. ------------------ Rezolvat
+Câmpul comentarii apare in table. -------------------------- Rezolvat
+Descarcare totala a datelor din tabel.---------------------- Rezolvat
+
+===========================================
 Filtrare tabel.
-
-
-Descarcare doar o pagina din raport si trebuie toate                Facut
 PDF pt un singur angajat
 
-
 Trebuie edit profile  
-Trebuie edit profile admin 
+Trebuie edit profile admin
 
-
-
-Tabel pontaje/ single.  http://localhost:5000
+Tabel pontaje/ single. http://localhost:5000
