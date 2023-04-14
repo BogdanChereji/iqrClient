@@ -233,11 +233,9 @@ function CreatePontaj() {
                         <MenuItem>
                           <em>Alege angajatul</em>
                         </MenuItem>
-                        {angajati.map(({ nume, prenume }, index) => (
-                          <MenuItem key={index} value={nume + ' ' + prenume}>
-                            {nume} {prenume}
-                          </MenuItem>
-                        ))}
+                        <MenuItem value={userInfo.name}>
+                          {userInfo.name}
+                        </MenuItem>
                       </Select>
                     </FormControl>
 

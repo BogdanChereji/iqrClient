@@ -9,24 +9,20 @@ import { Store } from '../../../Store';
 import tableIcons from '../tableIcons.js';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Button, IconButton, Switch } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { Paper } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { CsvBuilder } from 'filefy';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { useState } from 'react';
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
       return { ...state, loading: true };
     case 'FETCH_SUCCESS':
-      return { ...state, clienti: action.payload, loading: false };
+      return { ...state, pontaje: action.payload, loading: false };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
     case 'DELETE_REQUEST':
@@ -47,12 +43,12 @@ const reducer = (state, action) => {
   }
 };
 
-function DataClienti() {
+function DataPontaje() {
   const { state } = useContext(Store);
   const { userInfo } = state;
   const navigate = useNavigate();
-  const [{ clienti, error, successDelete }, dispatch] = useReducer(reducer, {
-    clienti: [],
+  const [{ pontaje, error, successDelete }, dispatch] = useReducer(reducer, {
+    pontaje: [],
     loading: true,
     error: '',
   });
@@ -61,7 +57,7 @@ function DataClienti() {
     const fetchData = async () => {
       try {
         const { data } = await axios.get(
-          `https://iqrserver.onrender.com/api/clienti `,
+          `https://iqrserver.onrender.com/api/pontaje `,
           {
             headers: { Authorization: `Bearer ${userInfo.token}` },
           }
@@ -90,45 +86,51 @@ function DataClienti() {
   };
 
   const data = [];
-  clienti &&
-    clienti.forEach((client) => {
+  pontaje &&
+    pontaje.forEach((pontaj) => {
       data.push({
-        _id: client._id,
-        codClient: client.codClient,
-        numeClient: client.numeClient,
-        cifClient: client.cifClient,
-        regcomClient: client.regcomClient,
-        tvaClient: client.tvaClient,
-        adresaClient: client.adresaClient,
-        localitateClient: client.localitateClient,
-        judetClient: client.judetClient,
-        contactClient: client.contactClient,
-        ibanClient: client.ibanClient,
-        bancaClient: client.bancaClient,
-        telefonClient: client.telefonClient,
-        emailClient: client.emailClient,
+        _id: pontaj._id,
+        numeAngajat: pontaj.numeAngajat,
+        data: pontaj.data,
+        ziua: pontaj.ziua,
+        denumireClient: pontaj.denumireClient,
+        denumireServiciu: pontaj.denumireServiciu,
+        timp: pontaj.timp,
+        distanta: pontaj.distanta,
+        comentariu: pontaj.comentariu,
+        user: pontaj.user,
       });
     });
-
   const columnsAdmin = [
     {
       title: 'ID',
       field: '_id',
       hidden: true,
     },
-    { title: 'COD', field: 'codClient' },
-    { title: 'NUME', field: 'numeClient' },
-    { title: 'CIF', field: 'cifClient' },
-    { title: 'TELEFON', field: 'telefonClient' },
-    { title: 'EMAIL', field: 'emailClient' },
-    { title: 'CONTACT', field: 'contactClient' },
-    { title: 'REGCOM', field: 'regcomClient', hidden: true },
-    { title: 'TVA', field: 'tvaClient', hidden: true },
-    { title: 'ADRESĂ', field: 'adresaClient', hidden: true },
-    { title: 'LOCALITATE', field: 'localitateClient', hidden: true },
-    { title: 'JUDET', field: 'judetClient', hidden: true },
-    { title: 'IBAN', field: 'ibanClient', hidden: true },
-    { title: 'BANCĂ', field: 'bancaClient', hidden: true },
+    { title: 'NUME', field: 'numeAngajat' },
+    {
+      title: 'DATA',
+      field: 'data',
+      type: 'date',
+      dateSetting: { locale: 'en-GB' },
+    },
+    {
+      title: 'ZIUA',
+      field: 'ziua',
+    },
+    { title: 'CLIENT', field: 'denumireClient' },
+    {
+      title: 'Servicii',
+      field: 'denumireServiciu',
+      cellStyle: {
+        whiteSpace: 'nowrap',
+        overflow: 'auto',
+        maxWidth: '250px',
+      },
+    },
+    { title: 'TIMP', field: 'timp' },
+    { title: 'DISTANTA ', field: 'distanta' },
+    { title: 'CMT', field: 'comentariu' },
     {
       title: 'ACTIUNI',
       align: 'center',
@@ -139,16 +141,10 @@ function DataClienti() {
               <DeleteIcon />
             </IconButton>
             <IconButton
-              onClick={() => navigate(`/admin/client/${data._id}`)}
+              onClick={() => navigate(`/admin/pontaj/${data._id}`)}
               aria-label="edit"
             >
               <EditIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => navigate(`/client/${data.numeClient}`)}
-              aria-label="view"
-            >
-              <VisibilityIcon />
             </IconButton>
           </Box>
         );
@@ -157,19 +153,39 @@ function DataClienti() {
   ];
 
   const columnsUser = [
-    { title: 'COD', field: 'codClient' },
-    { title: 'NUME', field: 'numeClient' },
-    { title: 'CIF', field: 'cifClient' },
-    { title: 'TELEFON', field: 'telefonClient' },
-    { title: 'EMAIL', field: 'emailClient' },
-    { title: 'CONTACT', field: 'contactClient' },
+    {
+      title: 'ID',
+      field: '_id',
+      hidden: true,
+    },
+    { title: 'NUME', field: 'numeAngajat' },
+    {
+      title: 'DATA',
+      field: 'data',
+      type: 'date',
+      dateSetting: { locale: 'en-GB' },
+    },
+    { title: 'ZIUA', field: 'ziua' },
+    { title: 'CLIENT', field: 'denumireClient' },
+    {
+      title: 'Servicii',
+      field: 'denumireServiciu',
+      cellStyle: {
+        whiteSpace: 'nowrap',
+        overflow: 'auto',
+        maxWidth: '250px',
+      },
+    },
+    { title: 'TIMP', field: 'timp' },
+    { title: 'DISTANTA ', field: 'distanta' },
+    { title: 'CMT', field: 'comentariu' },
   ];
 
-  const deleteHandler = async (client) => {
+  const deleteHandler = async (pontaj) => {
     if (window.confirm('Ești sigur că vrei să stergi înregistrarea?')) {
       try {
         await axios.delete(
-          `https://iqrserver.onrender.com/api/clienti/${client._id}`,
+          `https://iqrserver.onrender.com/api/pontaje/${pontaj._id}`,
           {
             headers: { Authorization: `Bearer ${userInfo.token}` },
           }
@@ -184,38 +200,22 @@ function DataClienti() {
       }
     }
   };
-  const [filter, setFilter] = useState(false); //buton arata filtrele
-  const handleChange = () => {
-    setFilter(!filter);
-  };
-
-  //Selecteaza randul si exporta
-
   const exportAllSelectedRows = () => {
     new CsvBuilder('pontaje.csv')
-      .setColumns(columnsUser.map((col) => col.title))
+      .setColumns(columnsAdmin.map((col) => col.title))
       .addRows(
         selectedRow.current.map((pontaj) =>
-          columnsUser.map((col) => pontaj[col.field])
+          columnsAdmin.map((col) => pontaj[col.field])
         )
       )
       .exportFile();
   };
+  const theme = useTheme();
+  const smUp = useMediaQuery(theme.breakpoints.up('sm'));
+  const mdDw = useMediaQuery(theme.breakpoints.down('md'));
 
-  const exportAllSelectedRowsPDF = () => {
-    const doc = new jsPDF();
-    doc.text('Pontaje', 20, 10);
-    doc.autoTable({
-      columns: columnsUser.map((col) => ({ ...col, dataKey: col.field })),
-      body: selectedRow.current.map((pontaj) =>
-        columnsUser.map((col) => pontaj[col.field])
-      ),
-      styles: {
-        fontSize: 8,
-        font: 'helvetica',
-      },
-    });
-    doc.save('pontaje.pdf');
+  let customStyle = {
+    width: '100%',
   };
 
   let headerStyle = {
@@ -223,13 +223,30 @@ function DataClienti() {
     color: '#ffffff',
   };
 
+  if (smUp) {
+    customStyle = {
+      ...customStyle,
+      width: '30ch',
+      color: '#1f1f1f',
+    };
+  }
+
+  if (mdDw) {
+    customStyle = {
+      ...customStyle,
+      marginRight: '13px',
+      width: '13ch',
+      color: '#1f1f1f',
+    };
+  }
+
   return (
     <Box sx={{ width: '100%' }}>
       {userInfo && userInfo.isAdmin ? (
         <MaterialTable
           data={data}
           columns={columnsAdmin}
-          title="Clienti"
+          title="Pontaje"
           icons={tableIcons}
           onSelectionChange={(e) => {
             handleClick(e);
@@ -243,10 +260,8 @@ function DataClienti() {
             showFirstLastPageButtons: false,
             paginationType: 'normal',
             selection: true,
-            sorting: true,
-            filtering: filter,
-            search: false,
             pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
+            searchFieldStyle: customStyle,
           }}
           localization={{
             pagination: {
@@ -260,31 +275,9 @@ function DataClienti() {
           }}
           actions={[
             {
-              icon: () => (
-                <Switch
-                  checked={filter}
-                  onChange={handleChange}
-                  inputProps={{ 'aria-label': 'controlled' }}
-                />
-              ),
-              tooltip: 'Arata filtrele',
-              isFreeAction: true,
-            },
-            {
-              icon: () => (
-                <Button onClick={exportAllSelectedRows} variant="contained">
-                  Exporta CSV
-                </Button>
-              ),
               tooltip: 'Exportă toate rânduri selectate',
-            },
-            {
-              icon: () => (
-                <Button onClick={exportAllSelectedRowsPDF} variant="contained">
-                  Exporta PDF
-                </Button>
-              ),
-              tooltip: 'Exportă toate rânduri selectate',
+              icon: () => <SaveAltIcon />,
+              onClick: () => exportAllSelectedRows(),
             },
           ]}
           components={{
@@ -295,7 +288,7 @@ function DataClienti() {
         <MaterialTable
           data={data}
           columns={columnsUser}
-          title="Clienti"
+          title="Pontaje"
           icons={tableIcons}
           onSelectionChange={(e) => {
             handleClick(e);
@@ -310,12 +303,9 @@ function DataClienti() {
             exportButton: false,
             showFirstLastPageButtons: false,
             paginationType: 'normal',
-            selection: false,
-            selection: false,
-            sorting: true,
-            filtering: filter,
-            search: false,
             pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
+            selection: false,
+            searchFieldStyle: customStyle,
           }}
           localization={{
             pagination: {
@@ -330,23 +320,10 @@ function DataClienti() {
           components={{
             Container: (props) => <Paper {...props} elevation={0} />,
           }}
-          actions={[
-            {
-              icon: () => (
-                <Switch
-                  checked={filter}
-                  onChange={handleChange}
-                  inputProps={{ 'aria-label': 'controlled' }}
-                />
-              ),
-              tooltip: 'Arata filtrele',
-              isFreeAction: true,
-            },
-          ]}
         />
       )}
     </Box>
   );
 }
 
-export default DataClienti;
+export default DataPontaje;

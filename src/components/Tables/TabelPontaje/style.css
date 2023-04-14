@@ -1,0 +1,18 @@
+.MuiTableSortLabel-root.Mui-active {
+  color: #fff !important;
+}
+
+.MuiTableSortLabel-root {
+  color: #fff !important;
+}
+
+.MuiTableRow-hover:hover {
+  background-color: #fff;
+}
+.MuiSvgIcon-root.MuiTableSortLabel-icon.MuiTableSortLabel-iconDirectionAsc.MuiTableSortLabel-icon {
+  color: #fff;
+}
+
+.MuiSvgIcon-root.MuiTableSortLabel-icon.MuiTableSortLabel-iconDirectionDesc.MuiTableSortLabel-icon {
+  color: #fff;
+}

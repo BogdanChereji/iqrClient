@@ -9,7 +9,7 @@ import { Store } from '../../../Store';
 import tableIcons from '../tableIcons.js';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { IconButton } from '@mui/material';
+import { Button, IconButton, Switch } from '@mui/material';
 import { Paper } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { CsvBuilder } from 'filefy';
@@ -17,6 +17,9 @@ import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { useState } from 'react';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -133,14 +136,7 @@ function DataEchipamente() {
     },
   ];
 
-  const columnsUser = [
-    {
-      title: 'ID',
-      field: '_id',
-      hidden: true,
-    },
-    { title: 'NUME', field: 'numeEchipament' },
-  ];
+  const columnsUser = [{ title: 'NUME', field: 'numeEchipament' }];
 
   const deleteHandler = async (echipament) => {
     if (window.confirm('Ești sigur că vrei să stergi înregistrarea?')) {
@@ -161,15 +157,36 @@ function DataEchipamente() {
       }
     }
   };
+  const [filter, setFilter] = useState(false); //buton arata filtrele
+  const handleChange = () => {
+    setFilter(!filter);
+  };
+
   const exportAllSelectedRows = () => {
-    new CsvBuilder('echipamente.csv')
-      .setColumns(columnsAdmin.map((col) => col.title))
+    new CsvBuilder('pontaje.csv')
+      .setColumns(columnsUser.map((col) => col.title))
       .addRows(
-        selectedRow.current.map((echipament) =>
-          columnsAdmin.map((col) => echipament[col.field])
+        selectedRow.current.map((pontaj) =>
+          columnsUser.map((col) => pontaj[col.field])
         )
       )
       .exportFile();
+  };
+
+  const exportAllSelectedRowsPDF = () => {
+    const doc = new jsPDF();
+    doc.text('Pontaje', 20, 10);
+    doc.autoTable({
+      columns: columnsUser.map((col) => ({ ...col, dataKey: col.field })),
+      body: selectedRow.current.map((pontaj) =>
+        columnsUser.map((col) => pontaj[col.field])
+      ),
+      styles: {
+        fontSize: 8,
+        font: 'helvetica',
+      },
+    });
+    doc.save('pontaje.pdf');
   };
   const theme = useTheme();
   const smUp = useMediaQuery(theme.breakpoints.up('sm'));
@@ -221,7 +238,10 @@ function DataEchipamente() {
             showFirstLastPageButtons: false,
             paginationType: 'normal',
             selection: true,
-            searchFieldStyle: customStyle,
+            sorting: true,
+            filtering: filter,
+            search: false,
+            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
           }}
           localization={{
             pagination: {
@@ -235,9 +255,31 @@ function DataEchipamente() {
           }}
           actions={[
             {
+              icon: () => (
+                <Switch
+                  checked={filter}
+                  onChange={handleChange}
+                  inputProps={{ 'aria-label': 'controlled' }}
+                />
+              ),
+              tooltip: 'Arata filtrele',
+              isFreeAction: true,
+            },
+            {
+              icon: () => (
+                <Button onClick={exportAllSelectedRows} variant="contained">
+                  Exporta CSV
+                </Button>
+              ),
               tooltip: 'Exportă toate rânduri selectate',
-              icon: () => <SaveAltIcon />,
-              onClick: () => exportAllSelectedRows(),
+            },
+            {
+              icon: () => (
+                <Button onClick={exportAllSelectedRowsPDF} variant="contained">
+                  Exporta PDF
+                </Button>
+              ),
+              tooltip: 'Exportă toate rânduri selectate',
             },
           ]}
           components={{
@@ -263,8 +305,11 @@ function DataEchipamente() {
             exportButton: false,
             showFirstLastPageButtons: false,
             paginationType: 'normal',
-            selection: false,
-            searchFieldStyle: customStyle,
+            selection: true,
+            sorting: true,
+            filtering: filter,
+            search: false,
+            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
           }}
           localization={{
             pagination: {

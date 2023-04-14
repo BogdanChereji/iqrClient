@@ -1,4 +1,7 @@
 import MaterialTable from 'material-table';
+import './style.css';
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 import React, { useEffect, useReducer, useContext } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
@@ -9,13 +12,13 @@ import { Store } from '../../../Store';
 import tableIcons from '../tableIcons.js';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { IconButton } from '@mui/material';
+import { Button, IconButton, Switch } from '@mui/material';
 import { Paper } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { CsvBuilder } from 'filefy';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
+import { useState } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -53,6 +56,8 @@ function DataPontaje() {
     error: '',
   });
 
+  //Get Tabel Pontaje
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -78,12 +83,29 @@ function DataPontaje() {
     }
   }, [userInfo, successDelete]);
 
-  //Tabel
+  //Functie stergere date tabel
 
-  const selectedRow = React.useRef([]);
-  const handleClick = (rows) => {
-    selectedRow.current = rows;
+  const deleteHandler = async (pontaj) => {
+    if (window.confirm('Ești sigur că vrei să stergi înregistrarea?')) {
+      try {
+        await axios.delete(
+          `https://iqrserver.onrender.com/api/pontaje/${pontaj._id}`,
+          {
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          }
+        );
+        toast.success('Înregistrarea a fost ștearsă');
+        dispatch({ type: 'DELETE_SUCCESS' });
+      } catch (err) {
+        toast.error(getError(error));
+        dispatch({
+          type: 'DELETE_FAIL',
+        });
+      }
+    }
   };
+
+  // ForEach date din tabel
 
   const data = [];
   pontaje &&
@@ -101,24 +123,67 @@ function DataPontaje() {
         user: pontaj.user,
       });
     });
+
+  const columnsPDF = [
+    {
+      title: 'NUME',
+      field: 'numeAngajat',
+    },
+    {
+      title: 'DATA',
+      field: 'data',
+      type: 'date',
+    },
+    {
+      title: 'ZIUA',
+      field: 'ziua',
+    },
+    {
+      title: 'CLIENT',
+      field: 'denumireClient',
+    },
+    {
+      title: 'Servicii',
+      field: 'denumireServiciu',
+    },
+    { title: 'TIMP', field: 'timp' },
+    { title: 'DISTANTA ', field: 'distanta' },
+    {
+      title: 'CMT',
+      field: 'comentariu',
+    },
+  ];
+
   const columnsAdmin = [
     {
       title: 'ID',
       field: '_id',
       hidden: true,
     },
-    { title: 'NUME', field: 'numeAngajat' },
+    {
+      title: 'NUME',
+      field: 'numeAngajat',
+      cellStyle: {
+        minWidth: '200px',
+      },
+    },
     {
       title: 'DATA',
       field: 'data',
       type: 'date',
-      dateSetting: { locale: 'en-GB' },
     },
     {
       title: 'ZIUA',
       field: 'ziua',
+      filtering: false,
     },
-    { title: 'CLIENT', field: 'denumireClient' },
+    {
+      title: 'CLIENT',
+      field: 'denumireClient',
+      cellStyle: {
+        minWidth: '250px',
+      },
+    },
     {
       title: 'Servicii',
       field: 'denumireServiciu',
@@ -128,9 +193,16 @@ function DataPontaje() {
         maxWidth: '250px',
       },
     },
-    { title: 'TIMP', field: 'timp' },
-    { title: 'DISTANTA ', field: 'distanta' },
-    { title: 'CMT', field: 'comentariu' },
+    { title: 'TIMP', field: 'timp', filtering: false },
+    { title: 'DISTANTA ', field: 'distanta', filtering: false },
+    {
+      title: 'CMT',
+      filtering: false,
+      field: 'comentariu',
+      cellStyle: {
+        minWidth: '200px',
+      },
+    },
     {
       title: 'ACTIUNI',
       align: 'center',
@@ -152,177 +224,167 @@ function DataPontaje() {
     },
   ];
 
-  const columnsUser = [
-    {
-      title: 'ID',
-      field: '_id',
-      hidden: true,
-    },
-    { title: 'NUME', field: 'numeAngajat' },
-    {
-      title: 'DATA',
-      field: 'data',
-      type: 'date',
-      dateSetting: { locale: 'en-GB' },
-    },
-    { title: 'ZIUA', field: 'ziua' },
-    { title: 'CLIENT', field: 'denumireClient' },
-    {
-      title: 'Servicii',
-      field: 'denumireServiciu',
-      cellStyle: {
-        whiteSpace: 'nowrap',
-        overflow: 'auto',
-        maxWidth: '250px',
-      },
-    },
-    { title: 'TIMP', field: 'timp' },
-    { title: 'DISTANTA ', field: 'distanta' },
-    { title: 'CMT', field: 'comentariu' },
-  ];
+  //Filtrare dupa data
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [filter, setFilter] = useState(false); //buton arata filtrele
 
-  const deleteHandler = async (pontaj) => {
-    if (window.confirm('Ești sigur că vrei să stergi înregistrarea?')) {
-      try {
-        await axios.delete(
-          `https://iqrserver.onrender.com/api/pontaje/${pontaj._id}`,
-          {
-            headers: { Authorization: `Bearer ${userInfo.token}` },
-          }
-        );
-        toast.success('Înregistrarea a fost ștearsă');
-        dispatch({ type: 'DELETE_SUCCESS' });
-      } catch (err) {
-        toast.error(getError(error));
-        dispatch({
-          type: 'DELETE_FAIL',
-        });
-      }
-    }
+  const handleChange = () => {
+    setFilter(!filter);
   };
+
+  const handleStartDateChange = (data) => {
+    setSelectedStartDate(data);
+  };
+
+  const handleEndDateChange = (data) => {
+    setSelectedEndDate(data);
+  };
+
+  const filterData = (startDate, endDate) => {
+    return data.filter((item) => {
+      const itemDate = new Date(item.data);
+      return startDate && endDate
+        ? itemDate >= startDate && itemDate <= endDate
+        : true;
+    });
+  };
+
+  //Selecteaza randul si exporta
+  const selectedRow = React.useRef([]);
+  const handleClick = (rows) => {
+    selectedRow.current = rows;
+  };
+
   const exportAllSelectedRows = () => {
     new CsvBuilder('pontaje.csv')
-      .setColumns(columnsAdmin.map((col) => col.title))
+      .setColumns(columnsPDF.map((col) => col.title))
       .addRows(
         selectedRow.current.map((pontaj) =>
-          columnsAdmin.map((col) => pontaj[col.field])
+          columnsPDF.map((col) => pontaj[col.field])
         )
       )
       .exportFile();
   };
-  const theme = useTheme();
-  const smUp = useMediaQuery(theme.breakpoints.up('sm'));
-  const mdDw = useMediaQuery(theme.breakpoints.down('md'));
 
-  let customStyle = {
-    width: '100%',
+  const exportAllSelectedRowsPDF = () => {
+    const doc = new jsPDF();
+    doc.text('Pontaje', 20, 10);
+    doc.autoTable({
+      columns: columnsPDF.map((col) => ({ ...col, dataKey: col.field })),
+      body: selectedRow.current.map((pontaj) =>
+        columnsPDF.map((col) => pontaj[col.field])
+      ),
+      styles: {
+        fontSize: 8,
+        font: 'helvetica',
+      },
+    });
+    doc.save('pontaje.pdf');
   };
-
-  let headerStyle = {
-    backgroundColor: '#000041',
-    color: '#ffffff',
-  };
-
-  if (smUp) {
-    customStyle = {
-      ...customStyle,
-      width: '30ch',
-      color: '#1f1f1f',
-    };
-  }
-
-  if (mdDw) {
-    customStyle = {
-      ...customStyle,
-      marginRight: '13px',
-      width: '13ch',
-      color: '#1f1f1f',
-    };
-  }
-
   return (
-    <Box sx={{ width: '100%' }}>
-      {userInfo && userInfo.isAdmin ? (
-        <MaterialTable
-          data={data}
-          columns={columnsAdmin}
-          title="Pontaje"
-          icons={tableIcons}
-          onSelectionChange={(e) => {
-            handleClick(e);
-          }}
-          options={{
-            padding: 'dense',
-            headerStyle: headerStyle,
-            showTextRowsSelected: false,
-            columnsButton: true,
-            exportButton: true,
-            showFirstLastPageButtons: false,
-            paginationType: 'normal',
-            selection: true,
-            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
-            searchFieldStyle: customStyle,
-          }}
-          localization={{
-            pagination: {
-              labelRowsSelect: 'rânduri',
-              labelRowsPerPage: false,
-              labelDisplayedRows: `{from} din {count}`,
-            },
-            body: {
-              emptyDataSourceMessage: 'Nu sunt date de afișat',
-            },
-          }}
-          actions={[
-            {
-              tooltip: 'Exportă toate rânduri selectate',
-              icon: () => <SaveAltIcon />,
-              onClick: () => exportAllSelectedRows(),
-            },
-          ]}
-          components={{
-            Container: (props) => <Paper {...props} elevation={0} />,
-          }}
-        />
-      ) : (
-        <MaterialTable
-          data={data}
-          columns={columnsUser}
-          title="Pontaje"
-          icons={tableIcons}
-          onSelectionChange={(e) => {
-            handleClick(e);
-          }}
-          options={{
-            padding: 'dense',
-            headerStyle: {
-              backgroundColor: '#000041',
-              color: '#ffffff',
-            },
-            columnsButton: true,
-            exportButton: false,
-            showFirstLastPageButtons: false,
-            paginationType: 'normal',
-            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
-            selection: false,
-            searchFieldStyle: customStyle,
-          }}
-          localization={{
-            pagination: {
-              labelRowsSelect: 'rânduri',
-              labelRowsPerPage: false,
-              labelDisplayedRows: `{from} din {count}`,
-            },
-            body: {
-              emptyDataSourceMessage: 'Nu sunt date de afișat',
-            },
-          }}
-          components={{
-            Container: (props) => <Paper {...props} elevation={0} />,
-          }}
-        />
-      )}
-    </Box>
+    <>
+      {' '}
+      <Box sx={{ mb: 1, textAlign: 'left' }}>
+        <div>
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <DatePicker
+              label="Data de început"
+              value={selectedStartDate}
+              onChange={handleStartDateChange}
+              format="dd/MM/yyyy"
+              clearable
+              inputVariant="outlined"
+              sx={{ backgroundColor: '#fff' }}
+            />
+            <DatePicker
+              label="Data de sfârșit"
+              value={selectedEndDate}
+              onChange={handleEndDateChange}
+              format="dd/MM/yyyy"
+              clearable
+              inputVariant="outlined"
+            />
+          </MuiPickersUtilsProvider>
+        </div>
+      </Box>
+      <MaterialTable
+        title="Pontaje"
+        icons={tableIcons}
+        onSelectionChange={(e) => {
+          handleClick(e);
+        }}
+        columns={columnsAdmin}
+        data={filterData(selectedStartDate, selectedEndDate)}
+        options={{
+          sorting: true,
+          filtering: filter,
+          search: false,
+          columnsButton: true,
+          exportButton: true,
+          showFirstLastPageButtons: true,
+          showTextRowsSelected: false,
+          paginationType: 'normal',
+          selection: true,
+          pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
+          headerStyle: {
+            backgroundColor: '#000041',
+            color: '#fff',
+          },
+        }}
+        localization={{
+          pagination: {
+            labelRowsSelect: 'rânduri',
+            labelRowsPerPage: false,
+            labelDisplayedRows: `{from} din {count}`,
+          },
+          body: {
+            emptyDataSourceMessage: 'Nu sunt date de afișat',
+          },
+        }}
+        components={{
+          Container: (props) => <Paper {...props} elevation={0} />,
+          SortLabel: (props) => (
+            <div
+              {...props}
+              style={{
+                ...props.style,
+                color: props.active ? '#fff' : '#fff',
+              }}
+            />
+          ),
+        }}
+        actions={[
+          {
+            icon: () => (
+              <Switch
+                checked={filter}
+                onChange={handleChange}
+                inputProps={{ 'aria-label': 'controlled' }}
+              />
+            ),
+            tooltip: 'Arata filtrele',
+            isFreeAction: true,
+          },
+          {
+            icon: () => (
+              <Button onClick={exportAllSelectedRows} variant="contained">
+                Exporta CSV
+              </Button>
+            ),
+            tooltip: 'Exportă toate rânduri selectate',
+          },
+          {
+            icon: () => (
+              <Button onClick={exportAllSelectedRowsPDF} variant="contained">
+                Exporta PDF
+              </Button>
+            ),
+            tooltip: 'Exportă toate rânduri selectate',
+          },
+        ]}
+      />
+    </>
   );
 }
 

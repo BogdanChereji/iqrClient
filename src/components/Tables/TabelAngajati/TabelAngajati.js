@@ -1,5 +1,5 @@
 import MaterialTable from 'material-table';
-import React, { useEffect, useReducer, useContext } from 'react';
+import React, { useEffect, useReducer, useContext, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 import Box from '@mui/material/Box';
@@ -9,7 +9,7 @@ import { Store } from '../../../Store';
 import tableIcons from '../tableIcons.js';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { IconButton } from '@mui/material';
+import { Button, IconButton, Switch } from '@mui/material';
 import { Paper } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { CsvBuilder } from 'filefy';
@@ -17,6 +17,8 @@ import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -144,7 +146,6 @@ function DataAngajati() {
   ];
 
   const columnsUser = [
-    { title: 'ID', field: '_id', hidden: true },
     { title: 'COD', field: 'codAngajat' },
     { title: 'NUME', field: 'nume' },
     { title: 'PRENUME', field: 'prenume' },
@@ -172,14 +173,30 @@ function DataAngajati() {
     }
   };
   const exportAllSelectedRows = () => {
-    new CsvBuilder('angajati.csv')
-      .setColumns(columnsAdmin.map((col) => col.title))
+    new CsvBuilder('pontaje.csv')
+      .setColumns(columnsUser.map((col) => col.title))
       .addRows(
-        selectedRow.current.map((angajat) =>
-          columnsAdmin.map((col) => angajat[col.field])
+        selectedRow.current.map((pontaj) =>
+          columnsUser.map((col) => pontaj[col.field])
         )
       )
       .exportFile();
+  };
+
+  const exportAllSelectedRowsPDF = () => {
+    const doc = new jsPDF();
+    doc.text('Pontaje', 20, 10);
+    doc.autoTable({
+      columns: columnsUser.map((col) => ({ ...col, dataKey: col.field })),
+      body: selectedRow.current.map((pontaj) =>
+        columnsUser.map((col) => pontaj[col.field])
+      ),
+      styles: {
+        fontSize: 8,
+        font: 'helvetica',
+      },
+    });
+    doc.save('pontaje.pdf');
   };
   const theme = useTheme();
   const smUp = useMediaQuery(theme.breakpoints.up('sm'));
@@ -206,6 +223,12 @@ function DataAngajati() {
     };
   }
 
+  const [filter, setFilter] = useState(false); //buton arata filtrele
+
+  const handleChange = () => {
+    setFilter(!filter);
+  };
+
   return (
     <Box sx={{ width: '100%' }}>
       {userInfo && userInfo.isAdmin ? (
@@ -218,6 +241,7 @@ function DataAngajati() {
             handleClick(e);
           }}
           options={{
+            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
             padding: 'dense',
             headerStyle: {
               backgroundColor: '#000041',
@@ -229,6 +253,9 @@ function DataAngajati() {
             showFirstLastPageButtons: false,
             paginationType: 'normal',
             selection: true,
+            sorting: true,
+            filtering: filter,
+            search: false,
             searchFieldStyle: customStyle,
           }}
           localization={{
@@ -241,16 +268,39 @@ function DataAngajati() {
               emptyDataSourceMessage: 'Nu sunt date de afișat',
             },
           }}
-          actions={[
-            {
-              tooltip: 'Exportă toate rânduri selectate',
-              icon: () => <SaveAltIcon />,
-              onClick: () => exportAllSelectedRows(),
-            },
-          ]}
           components={{
             Container: (props) => <Paper {...props} elevation={0} />,
           }}
+          actions={[
+            {
+              icon: () => (
+                <Switch
+                  checked={filter}
+                  onChange={handleChange}
+                  inputProps={{ 'aria-label': 'controlled' }}
+                />
+              ),
+              tooltip: 'Arata filtrele',
+              isFreeAction: true,
+            },
+
+            {
+              icon: () => (
+                <Button onClick={exportAllSelectedRows} variant="contained">
+                  Exporta CSV
+                </Button>
+              ),
+              tooltip: 'Exportă toate rânduri selectate',
+            },
+            {
+              icon: () => (
+                <Button onClick={exportAllSelectedRowsPDF} variant="contained">
+                  Exporta PDF
+                </Button>
+              ),
+              tooltip: 'Exportă toate rânduri selectate',
+            },
+          ]}
         />
       ) : (
         <MaterialTable
@@ -262,16 +312,21 @@ function DataAngajati() {
             handleClick(e);
           }}
           options={{
+            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
             padding: 'dense',
             headerStyle: {
               backgroundColor: '#000041',
               color: '#ffffff',
             },
+            showTextRowsSelected: false,
             columnsButton: true,
-            exportButton: false,
+            exportButton: true,
             showFirstLastPageButtons: false,
             paginationType: 'normal',
-            selection: false,
+            selection: true,
+            sorting: true,
+            filtering: filter,
+            search: false,
             searchFieldStyle: customStyle,
           }}
           localization={{
@@ -287,6 +342,24 @@ function DataAngajati() {
           components={{
             Container: (props) => <Paper {...props} elevation={0} />,
           }}
+          actions={[
+            {
+              icon: () => (
+                <Button onClick={exportAllSelectedRows} variant="contained">
+                  Exporta CSV
+                </Button>
+              ),
+              tooltip: 'Exportă toate rânduri selectate',
+            },
+            {
+              icon: () => (
+                <Button onClick={exportAllSelectedRowsPDF} variant="contained">
+                  Exporta PDF
+                </Button>
+              ),
+              tooltip: 'Exportă toate rânduri selectate',
+            },
+          ]}
         />
       )}
     </Box>
