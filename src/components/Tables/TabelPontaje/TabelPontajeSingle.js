@@ -46,6 +46,24 @@ const reducer = (state, action) => {
   }
 };
 
+function CustomPagination(props) {
+  const { ActionsComponent, page, pageSize, totalCount, onPageChange } = props;
+
+  const numPages = Math.ceil(totalCount / pageSize);
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div>{`Page ${page + 1} of ${numPages}`}</div>
+      <ActionsComponent
+        page={page}
+        pageSize={pageSize}
+        totalCount={totalCount}
+        onPageChange={onPageChange}
+      />
+    </div>
+  );
+}
+
 function DataPontaje() {
   const { state } = useContext(Store);
   const { userInfo } = state;
@@ -321,7 +339,8 @@ function DataPontaje() {
           exportButton: true,
           showFirstLastPageButtons: true,
           showTextRowsSelected: false,
-          paginationType: 'normal',
+          paginationType: 'custom',
+          paginationComponent: CustomPagination,
           selection: true,
           pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
           headerStyle: {

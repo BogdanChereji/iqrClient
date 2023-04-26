@@ -45,6 +45,23 @@ const reducer = (state, action) => {
       return state;
   }
 };
+function CustomPagination(props) {
+  const { ActionsComponent, page, pageSize, totalCount, onPageChange } = props;
+
+  const numPages = Math.ceil(totalCount / pageSize);
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div>{`Page ${page + 1} of ${numPages}`}</div>
+      <ActionsComponent
+        page={page}
+        pageSize={pageSize}
+        totalCount={totalCount}
+        onPageChange={onPageChange}
+      />
+    </div>
+  );
+}
 
 function DataAngajati() {
   const { state } = useContext(Store);
@@ -250,8 +267,9 @@ function DataAngajati() {
             showTextRowsSelected: false,
             columnsButton: true,
             exportButton: true,
-            showFirstLastPageButtons: false,
-            paginationType: 'normal',
+            showFirstLastPageButtons: true,
+            paginationType: 'custom',
+            paginationComponent: CustomPagination,
             selection: true,
             sorting: true,
             filtering: filter,
@@ -321,8 +339,9 @@ function DataAngajati() {
             showTextRowsSelected: false,
             columnsButton: true,
             exportButton: true,
-            showFirstLastPageButtons: false,
-            paginationType: 'normal',
+            showFirstLastPageButtons: true,
+            paginationType: 'custom',
+            paginationComponent: CustomPagination,
             selection: true,
             sorting: true,
             filtering: filter,

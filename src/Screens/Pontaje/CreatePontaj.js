@@ -299,7 +299,10 @@ function CreatePontaj() {
                         <MenuItem value="Duminica">Duminica </MenuItem>
                       </Select>
                     </FormControl>
-                    <FormControl required sx={{ mt: 2, width: '100%' }}>
+                    <FormControl
+                      required
+                      sx={{ mt: 2, width: '100%', maxWidth: '320px' }}
+                    >
                       <InputLabel id="denumireClient">
                         Alege clientul
                       </InputLabel>
@@ -329,7 +332,10 @@ function CreatePontaj() {
                       },
                     }}
                   >
-                    <FormControl required sx={{ mt: 2, width: '100%' }}>
+                    <FormControl
+                      required
+                      sx={{ mt: 2, width: '100%', maxWidth: '250px' }}
+                    >
                       <InputLabel id="denumireServiciu">
                         Alege serviciul
                       </InputLabel>
