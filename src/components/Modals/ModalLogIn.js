@@ -41,7 +41,7 @@ function ModalLogIn(props) {
     e.preventDefault();
     try {
       const { data } = await Axios.post(
-        'https://209.74.86.222:3000/api/users/signin',
+        'http://209.74.86.222:5000/api/users/signin',
         {
           email,
           password,
@@ -63,7 +63,7 @@ function ModalLogIn(props) {
     }
     try {
       const { data } = await Axios.post(
-        'https://209.74.86.222:3000/api/users/signup',
+        'http://209.74.86.222:5000/api/users/signup',
         {
           name,
           email,
