@@ -41,7 +41,7 @@ function ModalLogIn(props) {
     e.preventDefault();
     try {
       const { data } = await Axios.post(
-        'http://209.74.86.222:5000/api/users/signin',
+        'https://iqrserver.onrender.com/api/users/signin',
         {
           email,
           password,
@@ -63,7 +63,7 @@ function ModalLogIn(props) {
     }
     try {
       const { data } = await Axios.post(
-        'http://209.74.86.222:5000/api/users/signup',
+        'https://iqrserver.onrender.com/api/users/signup',
         {
           name,
           email,
